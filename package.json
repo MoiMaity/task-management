@@ -13,9 +13,11 @@
     "dev": "npm run dev --workspaces --if-present",
     "dev:api": "npm run dev --workspace @tms/api",
     "dev:web": "npm run dev --workspace @tms/web",
-    "build": "npm run build --workspace @tms/shared && npm run build --workspace @tms/api && npm run build --workspace @tms/web",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build:shared && npm run build --workspace @tms/api && npm run build --workspace @tms/web",
+    "typecheck": "npm run build:shared && npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run test --workspace @tms/api"
+    "test": "npm run test --workspace @tms/api",
+    "build:shared": "npm run build --workspace @tms/shared",
+    "postinstall": "npm run build:shared"
   }
 }

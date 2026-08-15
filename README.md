@@ -14,9 +14,11 @@ Full-stack task management application built for the Full Stack Developer
 | | |
 | --- | --- |
 | **App** | _TODO: deployed URL_ |
-| **API** | _TODO: deployed URL_ `/api` |
+| **API health** | _TODO: deployed URL_ `/api/health` |
 
 No credentials needed — choose **Continue as guest** on the login screen.
+
+Deployment steps are in [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 ## Screenshots
 
@@ -30,6 +32,7 @@ _TODO: desktop and mobile, one row per theme._
 | Styling | Tailwind CSS v4 | CSS-first config lets themes live as CSS variables rather than a JS config object. |
 | Backend | NestJS | Module boundaries and DI make the auth/tasks split explicit and the services testable in isolation. |
 | Database | MongoDB + Mongoose | Tasks are self-contained documents with no cross-entity joins, so a document store fits the access pattern. |
+| Hosting | Vercel · Railway · MongoDB Atlas | See [DEPLOYMENT.md](./DEPLOYMENT.md). |
 | Language | TypeScript throughout | A shared types package means the API contract is compiler-checked on both sides. |
 
 ## Getting started
@@ -149,6 +152,14 @@ easier to reason about. The trade-off is real: a successful XSS can read the
 token, which an httpOnly cookie prevents. For a production app handling real
 user data I would use httpOnly cookies with a refresh-token rotation and accept
 the CORS configuration cost.
+
+**`packages/shared` compiles to `dist` rather than exporting raw TypeScript.**
+`tsc` does not rewrite path aliases when it emits, so an API built against a
+`@tms/shared` → `packages/shared/src` alias produces a `dist/main.js` that
+still does `require('@tms/shared')` and resolves to a `.ts` entry point Node
+cannot execute. It works in development and fails only in production. Giving
+the package a real build step makes it resolve like any other dependency in
+both environments.
 
 **Guest-only auth.** The brief asks for guest login specifically. Each guest
 gets a persisted user document, and every task query filters by the

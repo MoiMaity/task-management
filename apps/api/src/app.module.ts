@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import configuration from './config/configuration';
 import { validateEnv } from './config/env.validation';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { validateEnv } from './config/env.validation';
         uri: config.getOrThrow<string>('mongodbUri'),
       }),
     }),
+    HealthModule,
     // AuthModule and TasksModule are registered here once built.
   ],
 })
