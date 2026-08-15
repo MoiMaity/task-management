@@ -13,8 +13,8 @@ Full-stack task management application built for the Full Stack Developer
 
 | | |
 | --- | --- |
-| **App** | _TODO: deployed URL_ |
-| **API health** | _TODO: deployed URL_ `/api/health` |
+| **App** | https://task-management-web-ten.vercel.app/ |
+| **API health** | https://task-management-web-ten.vercel.app/api/health |
 
 No credentials needed — choose **Continue as guest** on the login screen.
 
