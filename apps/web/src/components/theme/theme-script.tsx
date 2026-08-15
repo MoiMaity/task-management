@@ -1,35 +1,39 @@
-import { DEFAULT_THEME, THEME_STORAGE_KEY, THEMES } from '@/lib/theme';
+import {
+  ACCENTS,
+  ACCENT_STORAGE_KEY,
+  DEFAULT_ACCENT,
+  DEFAULT_THEME,
+  THEMES,
+  THEME_STORAGE_KEY,
+} from '@/lib/theme';
 
 /**
- * Applies the stored theme to <html> *before* the browser paints.
+ * Applies the stored theme and accent to <html> before the browser paints.
  *
- * This has to be a plain synchronous <script> injected into the document
- * rather than a useEffect: an effect runs after hydration, which means the
- * first frame renders with the default theme and the user sees a flash of the
- * wrong colours on every refresh. Blocking here costs well under a
- * millisecond and removes the flash entirely.
+ * This has to be a synchronous inline <script>, not a useEffect: an effect
+ * runs after hydration, so the first frame would render with the defaults and
+ * the user would see a flash of the wrong colours on every refresh.
  *
- * The script is self-contained (no imports at runtime) because it executes
- * before any bundle has loaded, so the theme list is serialised into it.
+ * It is self-contained because it executes before any bundle loads, so the
+ * valid value lists are serialised into it.
  */
 export function ThemeScript() {
   const script = `
 (function () {
-  try {
-    var themes = ${JSON.stringify(THEMES)};
-    var stored = localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});
-    var theme = themes.indexOf(stored) !== -1 ? stored : null;
-
-    if (!theme) {
-      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      theme = prefersDark && themes.indexOf('dark') !== -1 ? 'dark' : ${JSON.stringify(DEFAULT_THEME)};
+  var d = document.documentElement;
+  function pick(key, list, fallback) {
+    try {
+      var v = localStorage.getItem(key);
+      return list.indexOf(v) !== -1 ? v : fallback;
+    } catch (e) {
+      return fallback;
     }
-
-    document.documentElement.setAttribute('data-theme', theme);
-    document.documentElement.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-  } catch (e) {
-    document.documentElement.setAttribute('data-theme', ${JSON.stringify(DEFAULT_THEME)});
   }
+  var theme = pick(${JSON.stringify(THEME_STORAGE_KEY)}, ${JSON.stringify(THEMES)}, ${JSON.stringify(DEFAULT_THEME)});
+  var accent = pick(${JSON.stringify(ACCENT_STORAGE_KEY)}, ${JSON.stringify(ACCENTS)}, ${JSON.stringify(DEFAULT_ACCENT)});
+  d.setAttribute('data-theme', theme);
+  d.setAttribute('data-accent', accent);
+  d.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
 })();
 `.trim();
 

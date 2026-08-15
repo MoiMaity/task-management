@@ -2,72 +2,84 @@
 
 /*
  * ---------------------------------------------------------------------------
- * THEME TOKENS
+ * THEME TOKENS — TWO INDEPENDENT AXES
  * ---------------------------------------------------------------------------
- * Every colour in the app comes from a semantic token defined here. Components
- * use `bg-surface` / `text-fg-muted` and never a raw hex or a Tailwind palette
- * class, which is what makes adding a third theme a change to this file alone.
+ * The design exposes light/dark AND a six-option accent picker, and the two
+ * combine freely. They are therefore kept separate:
  *
- * The two-step indirection matters:
- *   1. Raw values are declared per theme under a `[data-theme]` selector.
- *   2. `@theme inline` maps them into Tailwind's namespace.
+ *   [data-theme="light|dark"]   surfaces, text, borders
+ *   [data-accent="blue|..."]    accent only
  *
- * `inline` is the important part. Without it Tailwind resolves the variable at
- * build time and every theme renders the same colours; with it the generated
- * utility keeps the `var()` reference, so flipping the attribute on <html>
- * re-themes the page instantly with no re-render.
+ * Adding an accent means adding one block below and one entry to ACCENTS in
+ * lib/theme.ts — no component changes.
  *
- * TODO(figma): replace every placeholder below with the exact values from the
- * design's colour styles. Keep the token *names*; only the values change.
+ * `@theme inline` is what makes this work at runtime. Without `inline`,
+ * Tailwind resolves each variable at build time and every combination renders
+ * identically; with it, the utility keeps the var() reference so flipping an
+ * attribute re-themes the page with no React re-render.
+ *
+ * TODO(figma): every value below is a PLACEHOLDER measured by eye from a
+ * screen recording, not read from the file. Replace all of them with the exact
+ * values from the Figma variables panel. Keep the token names; change only the
+ * values.
  */
 
 @layer base {
   :root,
   [data-theme="light"] {
-    /* Surfaces */
     --app-bg: #ffffff;
-    --app-surface: #f8f9fb;
+    --app-surface: #f7f7f8;
     --app-surface-raised: #ffffff;
-    --app-border: #e5e7eb;
+    --app-border: #e8e8ea;
 
-    /* Foreground */
-    --app-fg: #111827;
+    --app-fg: #18181b;
     --app-fg-muted: #6b7280;
     --app-fg-subtle: #9ca3af;
 
-    /* Brand / accent */
-    --app-primary: #4f46e5;
-    --app-primary-fg: #ffffff;
-    --app-primary-hover: #4338ca;
+    /* The primary button in the design is near-black in the default theme. */
+    --app-invert: #111114;
+    --app-invert-fg: #ffffff;
 
-    /* Status */
-    --app-success: #16a34a;
-    --app-warning: #d97706;
-    --app-danger: #dc2626;
-
-    /* Elevation */
     --app-shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 
   [data-theme="dark"] {
-    --app-bg: #0b0f19;
-    --app-surface: #111827;
-    --app-surface-raised: #1f2937;
-    --app-border: #2d3748;
+    --app-bg: #0a0a0b;
+    --app-surface: #141416;
+    --app-surface-raised: #1c1c1f;
+    --app-border: #2a2a2e;
 
-    --app-fg: #f9fafb;
-    --app-fg-muted: #9ca3af;
-    --app-fg-subtle: #6b7280;
+    --app-fg: #fafafa;
+    --app-fg-muted: #a1a1aa;
+    --app-fg-subtle: #71717a;
 
-    --app-primary: #6366f1;
-    --app-primary-fg: #ffffff;
-    --app-primary-hover: #818cf8;
-
-    --app-success: #22c55e;
-    --app-warning: #f59e0b;
-    --app-danger: #ef4444;
+    --app-invert: #fafafa;
+    --app-invert-fg: #111114;
 
     --app-shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  }
+
+  /* --- Accents. Order matches the Color Mode menu. ------------------------ */
+  [data-accent="amber"]   { --app-accent: #d97706; --app-accent-fg: #ffffff; }
+  [data-accent="blue"]    { --app-accent: #7c3aed; --app-accent-fg: #ffffff; }
+  [data-accent="pink"]    { --app-accent: #db2777; --app-accent-fg: #ffffff; }
+  [data-accent="rose"]    { --app-accent: #e11d48; --app-accent-fg: #ffffff; }
+  [data-accent="emerald"] { --app-accent: #059669; --app-accent-fg: #ffffff; }
+  [data-accent="black"]   { --app-accent: #18181b; --app-accent-fg: #ffffff; }
+
+  [data-theme="dark"][data-accent="black"] {
+    --app-accent: #fafafa;
+    --app-accent-fg: #18181b;
+  }
+
+  /* --- Priority colours, from the list view ------------------------------ */
+  :root {
+    --app-priority-urgent: #dc2626;
+    --app-priority-high: #ef4444;
+    --app-priority-medium: #f97316;
+    --app-priority-low: #9ca3af;
+    --app-priority-none: #9ca3af;
+    --app-due-overdue: #dc2626;
   }
 }
 
@@ -81,26 +93,25 @@
   --color-fg-muted: var(--app-fg-muted);
   --color-fg-subtle: var(--app-fg-subtle);
 
-  --color-primary: var(--app-primary);
-  --color-primary-fg: var(--app-primary-fg);
-  --color-primary-hover: var(--app-primary-hover);
+  --color-invert: var(--app-invert);
+  --color-invert-fg: var(--app-invert-fg);
 
-  --color-success: var(--app-success);
-  --color-warning: var(--app-warning);
-  --color-danger: var(--app-danger);
+  --color-accent: var(--app-accent);
+  --color-accent-fg: var(--app-accent-fg);
+
+  --color-priority-urgent: var(--app-priority-urgent);
+  --color-priority-high: var(--app-priority-high);
+  --color-priority-medium: var(--app-priority-medium);
+  --color-priority-low: var(--app-priority-low);
+  --color-priority-none: var(--app-priority-none);
+  --color-due-overdue: var(--app-due-overdue);
 
   --shadow-card: var(--app-shadow-card);
 
-  /* TODO(figma): set the real font families, and the type scale if the design
-     does not map cleanly onto Tailwind's defaults. */
+  /* TODO(figma): confirm the real font family and type scale. */
   --font-sans: var(--font-app-sans, ui-sans-serif), system-ui, sans-serif;
 }
 
-/*
- * A `dark:` variant driven by the attribute rather than the media query.
- * Prefer the semantic tokens above; this exists for the occasional one-off
- * that genuinely only differs in dark mode.
- */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @layer base {
@@ -116,9 +127,8 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Keyboard focus stays visible everywhere; mouse clicks stay clean. */
   :focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
