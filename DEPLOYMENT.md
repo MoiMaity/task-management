@@ -140,6 +140,34 @@ Both platforms redeploy on every push to `main`. Push small commits; if one
 breaks the build you will know within two minutes and the previous deploy stays
 live in the meantime.
 
+## Troubleshooting
+
+**`"/app/apps/api/node_modules": not found` during the Docker build**
+
+npm workspaces hoist dependencies into one root `node_modules` and only create
+`apps/*/node_modules` when a version conflict forces it. A Dockerfile that
+copies a per-workspace `node_modules` unconditionally will fail on any clean
+tree. Copy the root one only.
+
+**`npm ci` reports the lockfile is out of sync**
+
+Every workspace's `package.json` must be present before `npm ci` runs, even for
+workspaces the image does not build — npm validates the whole workspace set
+against the lockfile. That is why the Dockerfile copies `apps/web/package.json`
+into a stage that never builds the web app.
+
+**Cannot find module '@tms/shared'** at container start
+
+`node_modules/@tms/shared` is a symlink into `packages/shared`. The runtime
+stage must place `packages/shared/dist` and `packages/shared/package.json` at
+the same relative path, or the symlink dangles.
+
+**Build succeeds, container exits immediately**
+
+Check the deploy logs for the env validation error. A `JWT_SECRET` under 32
+characters or a malformed `MONGODB_URI` crashes the process at boot by design —
+that is `config/env.validation.ts` doing its job, not a deployment fault.
+
 ## Alternatives
 
 | Instead of | Use | Note |
