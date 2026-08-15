@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/*
+ * ---------------------------------------------------------------------------
+ * THEME TOKENS
+ * ---------------------------------------------------------------------------
+ * Every colour in the app comes from a semantic token defined here. Components
+ * use `bg-surface` / `text-fg-muted` and never a raw hex or a Tailwind palette
+ * class, which is what makes adding a third theme a change to this file alone.
+ *
+ * The two-step indirection matters:
+ *   1. Raw values are declared per theme under a `[data-theme]` selector.
+ *   2. `@theme inline` maps them into Tailwind's namespace.
+ *
+ * `inline` is the important part. Without it Tailwind resolves the variable at
+ * build time and every theme renders the same colours; with it the generated
+ * utility keeps the `var()` reference, so flipping the attribute on <html>
+ * re-themes the page instantly with no re-render.
+ *
+ * TODO(figma): replace every placeholder below with the exact values from the
+ * design's colour styles. Keep the token *names*; only the values change.
+ */
+
+@layer base {
+  :root,
+  [data-theme="light"] {
+    /* Surfaces */
+    --app-bg: #ffffff;
+    --app-surface: #f8f9fb;
+    --app-surface-raised: #ffffff;
+    --app-border: #e5e7eb;
+
+    /* Foreground */
+    --app-fg: #111827;
+    --app-fg-muted: #6b7280;
+    --app-fg-subtle: #9ca3af;
+
+    /* Brand / accent */
+    --app-primary: #4f46e5;
+    --app-primary-fg: #ffffff;
+    --app-primary-hover: #4338ca;
+
+    /* Status */
+    --app-success: #16a34a;
+    --app-warning: #d97706;
+    --app-danger: #dc2626;
+
+    /* Elevation */
+    --app-shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  [data-theme="dark"] {
+    --app-bg: #0b0f19;
+    --app-surface: #111827;
+    --app-surface-raised: #1f2937;
+    --app-border: #2d3748;
+
+    --app-fg: #f9fafb;
+    --app-fg-muted: #9ca3af;
+    --app-fg-subtle: #6b7280;
+
+    --app-primary: #6366f1;
+    --app-primary-fg: #ffffff;
+    --app-primary-hover: #818cf8;
+
+    --app-success: #22c55e;
+    --app-warning: #f59e0b;
+    --app-danger: #ef4444;
+
+    --app-shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  }
+}
+
+@theme inline {
+  --color-bg: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-surface-raised: var(--app-surface-raised);
+  --color-border-default: var(--app-border);
+
+  --color-fg: var(--app-fg);
+  --color-fg-muted: var(--app-fg-muted);
+  --color-fg-subtle: var(--app-fg-subtle);
+
+  --color-primary: var(--app-primary);
+  --color-primary-fg: var(--app-primary-fg);
+  --color-primary-hover: var(--app-primary-hover);
+
+  --color-success: var(--app-success);
+  --color-warning: var(--app-warning);
+  --color-danger: var(--app-danger);
+
+  --shadow-card: var(--app-shadow-card);
+
+  /* TODO(figma): set the real font families, and the type scale if the design
+     does not map cleanly onto Tailwind's defaults. */
+  --font-sans: var(--font-app-sans, ui-sans-serif), system-ui, sans-serif;
+}
+
+/*
+ * A `dark:` variant driven by the attribute rather than the media query.
+ * Prefer the semantic tokens above; this exists for the occasional one-off
+ * that genuinely only differs in dark mode.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Keyboard focus stays visible everywhere; mouse clicks stay clean. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
